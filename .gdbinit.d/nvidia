@@ -1,0 +1,23 @@
+python
+
+class NvProcessorUuidPrinter:
+    def __init__(self, val):
+        self.val = val
+
+    def to_string(self):
+        inferior = gdb.selected_inferior()
+        array = inferior.read_memory(int(self.val['uuid'].address), 16)
+        strarray = array.hex()
+        for pos in (20, 16, 12, 8):
+            strarray = strarray[0:pos] + "-" + strarray[pos:]
+
+        return strarray
+
+def nv_lookup_type(val):
+    if str(val.type) == 'NvProcessorUuid':
+        return NvProcessorUuidPrinter(val)
+    return None
+
+gdb.pretty_printers.append(nv_lookup_type)
+
+end
